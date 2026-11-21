@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Dict, List
 
 # ── Project Directory Paths ──────────────────────────────────────────────────
-# Resolves paths relative to project root
 SRC_DATA_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SRC_DATA_DIR.parent.parent
 
@@ -17,6 +16,29 @@ DATA_DIR = PROJECT_ROOT / "data" / "realistic"
 RAW_DATA_DIR = DATA_DIR / "raw"
 STRUCTURED_DATA_DIR = DATA_DIR / "structured"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
+SPLITS_DIR = DATA_DIR / "splits"
+
+# Split manifest and processed feature manifest paths
+SPLITS_MANIFEST_PATH = SPLITS_DIR / "splits_manifest.json"
+FEATURE_MANIFEST_PATH = PROCESSED_DATA_DIR / "feature_manifest.json"
+DATABASE_PATH = DATA_DIR / "energymind.db"
+
+# ── Spatio-Temporal Hybrid Partitioning Rules ────────────────────────────────
+# 10 held-out meters stratified across all 3 feeders, phases, and distance bands
+HELD_OUT_METERS: List[str] = [
+    "MS212-TN-0008",
+    "MS212-TN-0010",
+    "MS212-TN-0012",
+    "MS212-TN-0013",
+    "MS212-TN-0014",
+    "MS212-TN-0015",
+    "MS212-TN-0016",
+    "MS212-TN-0029",
+    "MS212-TN-0033",
+    "MS212-TN-0035",
+]
+VAL_CUTOFF_TIMESTAMP: str = "2026-11-18T00:00:00+00:00"
+TEST_CUTOFF_TIMESTAMP: str = "2026-11-19T00:00:00+00:00"
 
 # Default raw monolithic dataset path (primary in data/realistic/raw, fallback to root)
 PRIMARY_RAW_CSV = RAW_DATA_DIR / "neighborhood_dataset.csv"
@@ -233,4 +255,43 @@ COLUMN_DTYPES: Dict[str, str] = {
     "auto_diagnostic": "string",
     "quality_flags": "int64",
     "label": "string",
+}
+
+# ── Hierarchical Target Classification Mapping (Tier-1 Macro Tiers) ─────────
+TIER1_TARGET_MAP: Dict[str, str] = {
+    # 1. Normal Operation (4 classes)
+    "normal": "NORMAL",
+    "normal_export_q2": "NORMAL",
+    "normal_export_q3": "NORMAL",
+    "normal_capacitive_q4": "NORMAL",
+
+    # 2. Falsification & Revenue Fraud Attacks (7 classes)
+    "tamper_magnetic": "FALSIFICATION_ATTACK",
+    "tamper_top_cover": "FALSIFICATION_ATTACK",
+    "tamper_terminal_cover": "FALSIFICATION_ATTACK",
+    "tamper_io_swap": "FALSIFICATION_ATTACK",
+    "tamper_phase_neutral_swap": "FALSIFICATION_ATTACK",
+    "tamper_multiple": "FALSIFICATION_ATTACK",
+    "neutral_disturbance": "FALSIFICATION_ATTACK",
+
+    # 3. Genuine Grid Disturbances & Power Quality (5 classes)
+    "power_cut": "GENUINE_GRID_EVENT",
+    "voltage_interruption": "GENUINE_GRID_EVENT",
+    "undervoltage": "GENUINE_GRID_EVENT",
+    "overvoltage": "GENUINE_GRID_EVENT",
+    "frequency_deviation": "GENUINE_GRID_EVENT",
+
+    # 4. Equipment & Load Faults (4 classes)
+    "neutral_current_imbalance": "EQUIPMENT_FAULT",
+    "overcurrent": "EQUIPMENT_FAULT",
+    "poor_power_factor": "EQUIPMENT_FAULT",
+    "device_fault": "EQUIPMENT_FAULT",
+
+    # 5. Data Quality & Communications Impairments (6 classes)
+    "constant_bias": "DATA_QUALITY_ISSUE",
+    "meter_drift": "DATA_QUALITY_ISSUE",
+    "missing_data": "DATA_QUALITY_ISSUE",
+    "dropout": "DATA_QUALITY_ISSUE",
+    "random_corruption": "DATA_QUALITY_ISSUE",
+    "energy_power_mismatch": "DATA_QUALITY_ISSUE",
 }

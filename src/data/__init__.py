@@ -13,17 +13,27 @@ from src.data.config import (
     ELECTRICAL_MEASUREMENTS_COLUMNS,
     ENERGY_REGISTERS_COLUMNS,
     FALLBACK_RAW_CSV,
+    FEATURE_MANIFEST_PATH,
+    HELD_OUT_METERS,
     LABELS_COLUMNS,
     METER_EVENTS_COLUMNS,
     METER_REGISTRY_COLUMNS,
     ORIGINAL_COLUMNS,
     PRIMARY_RAW_CSV,
+    PROCESSED_DATA_DIR,
     PROJECT_ROOT,
     RAW_DATA_DIR,
+    SPLITS_DIR,
+    SPLITS_MANIFEST_PATH,
     STRUCTURED_DATA_DIR,
+    TEST_CUTOFF_TIMESTAMP,
+    TIER1_TARGET_MAP,
+    VAL_CUTOFF_TIMESTAMP,
 )
 from src.data.splitter import DatasetSplitter
 from src.data.reconstructor import DatasetReconstructor
+from src.data.partitioner import DatasetPartitioner
+from src.data.database import EnergyMindDatabase, build_database
 from src.data.validator import (
     DataIntegrityValidator,
     SchemaValidator,
@@ -54,6 +64,9 @@ from src.data.models import (
 
 __all__ = [
     "DatasetSplitter",
+    "DatasetPartitioner",
+    "EnergyMindDatabase",
+    "build_database",
     "NeighborhoodDataLoader",
     "DatasetReconstructor",
     "DataIntegrityValidator",
@@ -90,5 +103,13 @@ __all__ = [
     "FALLBACK_RAW_CSV",
     "RAW_DATA_DIR",
     "STRUCTURED_DATA_DIR",
+    "PROCESSED_DATA_DIR",
+    "SPLITS_DIR",
+    "SPLITS_MANIFEST_PATH",
+    "FEATURE_MANIFEST_PATH",
+    "HELD_OUT_METERS",
+    "VAL_CUTOFF_TIMESTAMP",
+    "TEST_CUTOFF_TIMESTAMP",
+    "TIER1_TARGET_MAP",
     "PROJECT_ROOT",
 ]

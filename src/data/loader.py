@@ -13,8 +13,12 @@ import pandas as pd
 
 from src.data.config import (
     DOMAIN_CATALOG,
+    HELD_OUT_METERS,
     METER_REGISTRY_COLUMNS,
+    PROCESSED_DATA_DIR,
     STRUCTURED_DATA_DIR,
+    TEST_CUTOFF_TIMESTAMP,
+    VAL_CUTOFF_TIMESTAMP,
 )
 
 logger = logging.getLogger(__name__)
@@ -310,3 +314,84 @@ class NeighborhoodDataLoader:
             start_time=start_time,
             end_time=end_time,
         )
+
+    # ── Split Slicing & Partition Loaders ────────────────────────────────────
+
+    def load_split(
+        self,
+        split_name: str,
+        domain_names: Optional[List[str]] = None,
+        include_registry: bool = True,
+        columns: Optional[List[str]] = None,
+    ) -> pd.DataFrame:
+        """
+        Loads observations belonging to a specific partition ('train', 'val', 'test_temporal', 'test_spatial')
+        using direct, lightweight rule-based filtering (zero index file overhead).
+
+        Parameters
+        ----------
+        split_name : str
+            One of 'train', 'val', 'test_temporal', 'test_spatial'
+        domain_names : list of str, optional
+            List of domain names to load. Defaults to all observation domains.
+        include_registry : bool
+            Whether to enrich with meter_registry metadata (feeder, phase, distance).
+        columns : list of str, optional
+            Column projection subset.
+        """
+        valid_splits = ["train", "val", "test_temporal", "test_spatial"]
+        if split_name not in valid_splits:
+            raise ValueError(f"Unknown split: '{split_name}'. Valid splits: {valid_splits}")
+
+        if domain_names is None:
+            domain_names = [
+                d for d, meta in DOMAIN_CATALOG.items() if meta["is_observation_level"]
+            ]
+
+        # Ensure filtering keys are present in columns
+        load_cols = list(columns) if columns is not None else None
+        if load_cols is not None:
+            for k in ["record_id", "meter_id", "event_timestamp"]:
+                if k not in load_cols:
+                    load_cols.insert(0, k)
+
+        df = self.load_domains(
+            domain_names=domain_names,
+            include_registry=include_registry,
+            columns=load_cols,
+        )
+
+        spatial_set = set(HELD_OUT_METERS)
+        is_spatial = df["meter_id"].isin(spatial_set)
+
+        if split_name == "test_spatial":
+            mask = is_spatial
+        elif split_name == "train":
+            mask = (~is_spatial) & (df["event_timestamp"] < VAL_CUTOFF_TIMESTAMP)
+        elif split_name == "val":
+            mask = (
+                (~is_spatial)
+                & (df["event_timestamp"] >= VAL_CUTOFF_TIMESTAMP)
+                & (df["event_timestamp"] < TEST_CUTOFF_TIMESTAMP)
+            )
+        elif split_name == "test_temporal":
+            mask = (~is_spatial) & (df["event_timestamp"] >= TEST_CUTOFF_TIMESTAMP)
+
+        result_df = df[mask].reset_index(drop=True)
+        if columns is not None:
+            available = [c for c in columns if c in result_df.columns]
+            result_df = result_df[available]
+
+        return result_df
+
+    def load_processed_split(self, split_name: str) -> pd.DataFrame:
+        """
+        Loads precomputed ML-ready feature matrix from data/realistic/processed/{split_name}.parquet.
+        """
+        parquet_file = PROCESSED_DATA_DIR / f"{split_name}.parquet"
+        if not parquet_file.exists():
+            raise FileNotFoundError(
+                f"Processed split file not found at {parquet_file}. Run DatasetPartitioner first."
+            )
+        return pd.read_parquet(parquet_file)
+

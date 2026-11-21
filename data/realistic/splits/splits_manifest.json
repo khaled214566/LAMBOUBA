@@ -1,0 +1,81 @@
+{
+  "version": "1.0.0",
+  "created_at": "2026-11-21",
+  "strategy": "spatio-temporal-hybrid",
+  "total_records": 504000,
+  "split_counts": {
+    "train": 288000,
+    "test_spatial": 100800,
+    "val": 57600,
+    "test_temporal": 57600
+  },
+  "meters": {
+    "total_count": 50,
+    "training_meters_count": 40,
+    "held_out_meters_count": 10,
+    "training_meters": [
+      "MS212-TN-0001",
+      "MS212-TN-0002",
+      "MS212-TN-0003",
+      "MS212-TN-0004",
+      "MS212-TN-0005",
+      "MS212-TN-0006",
+      "MS212-TN-0007",
+      "MS212-TN-0009",
+      "MS212-TN-0011",
+      "MS212-TN-0017",
+      "MS212-TN-0018",
+      "MS212-TN-0019",
+      "MS212-TN-0020",
+      "MS212-TN-0021",
+      "MS212-TN-0022",
+      "MS212-TN-0023",
+      "MS212-TN-0024",
+      "MS212-TN-0025",
+      "MS212-TN-0026",
+      "MS212-TN-0027",
+      "MS212-TN-0028",
+      "MS212-TN-0030",
+      "MS212-TN-0031",
+      "MS212-TN-0032",
+      "MS212-TN-0034",
+      "MS212-TN-0036",
+      "MS212-TN-0037",
+      "MS212-TN-0038",
+      "MS212-TN-0039",
+      "MS212-TN-0040",
+      "MS212-TN-0041",
+      "MS212-TN-0042",
+      "MS212-TN-0043",
+      "MS212-TN-0044",
+      "MS212-TN-0045",
+      "MS212-TN-0046",
+      "MS212-TN-0047",
+      "MS212-TN-0048",
+      "MS212-TN-0049",
+      "MS212-TN-0050"
+    ],
+    "held_out_meters": [
+      "MS212-TN-0008",
+      "MS212-TN-0010",
+      "MS212-TN-0012",
+      "MS212-TN-0013",
+      "MS212-TN-0014",
+      "MS212-TN-0015",
+      "MS212-TN-0016",
+      "MS212-TN-0029",
+      "MS212-TN-0033",
+      "MS212-TN-0035"
+    ]
+  },
+  "temporal_cutoffs": {
+    "val_start": "2026-11-18T00:00:00+00:00",
+    "test_start": "2026-11-19T00:00:00+00:00"
+  },
+  "split_descriptions": {
+    "train": "Days 1-5 (Nov 13-17) across 40 meters. Used for training and baseline learning.",
+    "val": "Day 6 (Nov 18) across 40 meters. Used for early stopping and threshold tuning.",
+    "test_temporal": "Day 7 (Nov 19) across 40 meters. Tests forward-time detection on known meters.",
+    "test_spatial": "Days 1-7 (Nov 13-19) across 10 unseen held-out meters. Tests zero-shot generalization."
+  }
+}
