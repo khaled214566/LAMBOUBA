@@ -1,0 +1,104 @@
+schema_name: meter_events
+schema_version: 1.0.0
+description: "Electrical power quality events, tamper switch activations, and fraud detection indicators."
+owner: "Revenue Protection & Fraud Investigation"
+
+primary_key:
+  - record_id
+
+foreign_keys:
+  - column: meter_id
+    references: meter_registry.meter_id
+
+fields:
+  record_id:
+    type: integer
+    required: true
+    nullable: false
+    min: 1
+    description: "Unique sequential primary key identifying the 1-minute neighborhood observation."
+
+  meter_id:
+    type: string
+    required: true
+    nullable: false
+    format: "MS212-TN-\\d{4}"
+    description: "Identifier of the associated Sagemcom MS212 smart meter."
+
+  event_timestamp:
+    type: datetime
+    format: "ISO8601"
+    required: true
+    nullable: false
+    timezone: "UTC"
+    description: "Meter clock observation timestamp at 1-minute sampling interval."
+
+  voltage_interruptions:
+    type: integer
+    required: true
+    nullable: false
+    min: 0
+    description: "Cumulative counter of voltage interruption events detected by the meter."
+
+  voltage_restorations:
+    type: integer
+    required: true
+    nullable: false
+    min: 0
+    description: "Cumulative counter of voltage restoration events following an interruption."
+
+  power_factor_variation_detected:
+    type: integer
+    required: true
+    nullable: false
+    allowed_values: [0, 1]
+    description: "Binary flag indicating rapid or abnormal power factor deviation (|cos phi| below threshold)."
+
+  magnetic_field_detected:
+    type: integer
+    required: true
+    nullable: false
+    allowed_values: [0, 1]
+    description: "Binary tamper flag from internal Hall-effect sensor detecting external magnetic field sabotage (>300 mT)."
+
+  top_cover_opened:
+    type: integer
+    required: true
+    nullable: false
+    allowed_values: [0, 1]
+    description: "Binary tamper flag indicating meter enclosure main top cover has been breached."
+
+  terminal_cover_opened:
+    type: integer
+    required: true
+    nullable: false
+    allowed_values: [0, 1]
+    description: "Binary tamper flag indicating electrical terminal block cover switch was triggered."
+
+  io_swap:
+    type: integer
+    required: true
+    nullable: false
+    allowed_values: [0, 1]
+    description: "Binary tamper flag indicating current sensor input/output inversion fraud."
+
+  phase_neutral_swap:
+    type: integer
+    required: true
+    nullable: false
+    allowed_values: [0, 1]
+    description: "Binary tamper flag indicating reversed phase and neutral line connections."
+
+  mains_power_cut:
+    type: integer
+    required: true
+    nullable: false
+    allowed_values: [0, 1]
+    description: "Binary alert indicating complete upstream mains power outage (grid black-out)."
+
+  neutral_disturbance:
+    type: integer
+    required: true
+    nullable: false
+    allowed_values: [0, 1]
+    description: "Binary alert indicating neutral line disconnection, grounding bypass, or artificial neutral injection."

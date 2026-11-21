@@ -1,0 +1,89 @@
+schema_name: energy_registers
+schema_version: 1.0.0
+description: "Cumulative energy measurement registers and billing tariff states from MS212 smart meters."
+owner: "Billing & Meter Data Management (MDM)"
+
+primary_key:
+  - record_id
+
+foreign_keys:
+  - column: meter_id
+    references: meter_registry.meter_id
+
+fields:
+  record_id:
+    type: integer
+    required: true
+    nullable: false
+    min: 1
+    description: "Unique sequential primary key identifying the 1-minute neighborhood observation."
+
+  meter_id:
+    type: string
+    required: true
+    nullable: false
+    format: "MS212-TN-\\d{4}"
+    description: "Identifier of the associated Sagemcom MS212 smart meter."
+
+  event_timestamp:
+    type: datetime
+    format: "ISO8601"
+    required: true
+    nullable: false
+    timezone: "UTC"
+    description: "Meter clock observation timestamp at 1-minute sampling interval."
+
+  active_import_kWh:
+    type: float
+    unit: "kWh"
+    required: true
+    nullable: false
+    min: 0.0
+    description: "Cumulative active energy imported from the grid (forward energy register)."
+
+  active_export_kWh:
+    type: float
+    unit: "kWh"
+    required: true
+    nullable: false
+    min: 0.0
+    description: "Cumulative active energy exported to the grid (reverse energy register from rooftop solar PV)."
+
+  reactive_Q1_kvarh:
+    type: float
+    unit: "kvarh"
+    required: true
+    nullable: false
+    min: 0.0
+    description: "Cumulative reactive energy in Quadrant 1 (active positive, reactive positive: inductive import)."
+
+  reactive_Q2_kvarh:
+    type: float
+    unit: "kvarh"
+    required: true
+    nullable: false
+    min: 0.0
+    description: "Cumulative reactive energy in Quadrant 2 (active negative, reactive positive: capacitive export)."
+
+  reactive_Q3_kvarh:
+    type: float
+    unit: "kvarh"
+    required: true
+    nullable: false
+    min: 0.0
+    description: "Cumulative reactive energy in Quadrant 3 (active negative, reactive negative: inductive export)."
+
+  reactive_Q4_kvarh:
+    type: float
+    unit: "kvarh"
+    required: true
+    nullable: false
+    min: 0.0
+    description: "Cumulative reactive energy in Quadrant 4 (active positive, reactive negative: capacitive import)."
+
+  tariff_register:
+    type: string
+    required: true
+    nullable: false
+    allowed_values: ["T1", "T2", "T3"]
+    description: "Active time-of-use tariff register code under STEG residential tariff schedule."

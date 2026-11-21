@@ -1,0 +1,48 @@
+schema_name: meter_registry
+schema_version: 1.0.0
+description: "Static meter metadata and low-voltage network topology for the EnergyMind Tunisia neighborhood."
+owner: "Grid Operations & Meter Asset Management"
+
+primary_key:
+  - meter_id
+
+foreign_keys: []
+
+fields:
+  meter_id:
+    type: string
+    required: true
+    nullable: false
+    format: "MS212-TN-\\d{4}"
+    description: "Unique Sagemcom MS212 single-phase smart meter hardware identifier."
+    examples: ["MS212-TN-0001", "MS212-TN-0050"]
+
+  feeder_id:
+    type: string
+    required: true
+    nullable: false
+    allowed_values: ["feeder_01", "feeder_02", "feeder_03"]
+    description: "Distribution transformer LV outgoing feeder line identifier."
+
+  phase:
+    type: string
+    required: true
+    nullable: false
+    allowed_values: ["L1", "L2", "L3"]
+    description: "Three-phase distribution feeder line connection (Phase 1, Phase 2, or Phase 3)."
+
+  distance_from_transformer_m:
+    type: float
+    unit: "m"
+    required: true
+    nullable: false
+    min: 10.0
+    max: 1200.0
+    description: "Radial electrical cable distance from the MV/LV secondary distribution transformer substation in meters."
+
+  household_type:
+    type: string
+    required: true
+    nullable: false
+    allowed_values: ["family_home", "high_usage_home", "small_flat"]
+    description: "STEG residential consumption profile and demographic categorization."

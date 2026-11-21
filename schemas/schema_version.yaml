@@ -1,0 +1,16 @@
+version: 1.0.0
+last_updated: "2026-11-21"
+project: EnergyMind Tunisia
+specification_standard: "Sagemcom MS212 DLMS/COSEM & STEG Distribution Grid"
+semver_policy:
+  major: "Breaking schema changes: column removal, renaming, key modification, or narrowing allowed value sets."
+  minor: "Backward-compatible extensions: non-breaking column additions, widening value constraints, or new optional domains."
+  patch: "Non-breaking corrections: documentation updates, description clarifications, or typo fixes."
+domains:
+  meter_registry: 1.0.0
+  energy_registers: 1.0.0
+  electrical_measurements: 1.0.0
+  meter_events: 1.0.0
+  device_status: 1.0.0
+  communications: 1.0.0
+  labels: 1.0.0

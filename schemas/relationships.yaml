@@ -1,0 +1,55 @@
+version: 1.0.0
+description: "Cross-domain relational topology and referential integrity contract for EnergyMind Tunisia."
+
+primary_keys:
+  meter_registry:
+    columns: ["meter_id"]
+    type: "string"
+    uniqueness: true
+    description: "Unique hardware and installation identifier of the MS212 smart meter."
+
+  observation_domains:
+    domains:
+      - energy_registers
+      - electrical_measurements
+      - meter_events
+      - device_status
+      - communications
+      - labels
+    columns: ["record_id"]
+    type: "integer"
+    uniqueness: true
+    description: "Monotonically increasing surrogate observation identifier (1-minute cadence)."
+
+foreign_keys:
+  - source_domains:
+      - energy_registers
+      - electrical_measurements
+      - meter_events
+      - device_status
+      - communications
+      - labels
+    source_column: "meter_id"
+    target_domain: "meter_registry"
+    target_column: "meter_id"
+    cardinality: "many-to-one"
+    on_delete: "restrict"
+    description: "Associates every 1-minute telemetry observation with static meter metadata."
+
+joins:
+  observation_alignment:
+    join_type: "inner"
+    on: ["record_id"]
+    consistency_keys: ["meter_id", "event_timestamp"]
+    description: "Synchronous join across all observation tables aligned by sampling timestamp."
+
+  registry_enrichment:
+    join_type: "left"
+    on: ["meter_id"]
+    description: "Enriches observation data with network topology (feeder, phase, distance)."
+
+quarantine_rules:
+  labels:
+    target_domain: "labels"
+    isolation_level: "strict"
+    description: "Ground-truth classification target ('label') must remain quarantined from feature matrices during unsupervised learning, anomaly detection, and production inference."

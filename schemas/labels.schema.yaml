@@ -1,0 +1,66 @@
+schema_name: labels
+schema_version: 1.0.0
+description: "Quarantined ground-truth classification labels for training and testing AI models."
+owner: "Data Science & Model Development"
+
+primary_key:
+  - record_id
+
+foreign_keys:
+  - column: meter_id
+    references: meter_registry.meter_id
+
+fields:
+  record_id:
+    type: integer
+    required: true
+    nullable: false
+    min: 1
+    description: "Unique sequential primary key identifying the 1-minute neighborhood observation."
+
+  meter_id:
+    type: string
+    required: true
+    nullable: false
+    format: "MS212-TN-\\d{4}"
+    description: "Identifier of the associated Sagemcom MS212 smart meter."
+
+  event_timestamp:
+    type: datetime
+    format: "ISO8601"
+    required: true
+    nullable: false
+    timezone: "UTC"
+    description: "Meter clock observation timestamp at 1-minute sampling interval."
+
+  label:
+    type: string
+    required: true
+    nullable: false
+    allowed_values:
+      - "constant_bias"
+      - "device_fault"
+      - "dropout"
+      - "energy_power_mismatch"
+      - "frequency_deviation"
+      - "meter_drift"
+      - "missing_data"
+      - "neutral_current_imbalance"
+      - "neutral_disturbance"
+      - "normal"
+      - "normal_capacitive_q4"
+      - "normal_export_q2"
+      - "normal_export_q3"
+      - "overcurrent"
+      - "overvoltage"
+      - "poor_power_factor"
+      - "power_cut"
+      - "random_corruption"
+      - "tamper_io_swap"
+      - "tamper_magnetic"
+      - "tamper_multiple"
+      - "tamper_phase_neutral_swap"
+      - "tamper_terminal_cover"
+      - "tamper_top_cover"
+      - "undervoltage"
+    description: "Supervised ground-truth classification label indicating operational state, power quality fault, or fraud type."
